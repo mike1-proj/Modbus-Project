@@ -1,0 +1,49 @@
+The old Binary Payload Decoder and other functions formerly located in constants.py and utilities.py used for converting from floats in 32 bit format has been replaced in latest versions.
+
+The functions convert_from_registers and convert_to_registers were intended as a replacement but it seems they might not be in the utilities.py file in specific 3.11.4 installation, where they were supposed to have been re-located to.
+It turns out that these conversion functions are intended to be called as methods of the client instance itself (because the Modbus Client Mixin.py includes them), not as standalone functions imported from utilities. 
+The Correct Approach: Use Client Instance Methods
+You do not import the functions; you call them directly on the client object you create. The functions handle the conversion internally.
+Here is an example code showing how to use the new functions.
+
+No imports from payload, constants, or utilities needed for the conversion any more.
+
+
+python TCP Modbus example code with new conversion methods
+No imports from payload, constants, or utilities needed for the conversion any more.
+You can do the same thing in Modbus serial client.
+
+from pymodbus.client import ModbusTcpClient
+
+client = ModbusTcpClient(host='127.0.0.1', port=502)
+client.connect()
+# Read the raw registers (e.g., 2 registers for a 32-bit value)
+result = client.read_holding_registers(address=0, count=2)
+if not result.isError(): # if there is no error then
+    # Call the conversion method ON the client object
+    # also Use the client.DATATYPE enum for clarity
+ value_float = client.convert_from_registers(
+        result.registers, 
+        data_type=client.DATATYPE.FLOAT32)
+   print(f"Decoded float value: {value_float}")
+  # You can also use this for 32-bit integers:
+    # value_int32 = client.convert_from_registers(
+    #     result.registers, 
+    #     data_type=client.DATATYPE.INT32
+    # )
+else:
+    print("Error reading registers")
+client.close()
+Key Change Summary:
+    • You use client.convert_from_registers() instead of convert_from_registers().
+    • You use data_type=client.DATATYPE.FLOAT32 instead of the fmt='>f' string format.
+    • You no longer need the Endian constants as the DATATYPE enum handles common endianness types (e.g., FLOAT32 implies a standard representation that works with the client's default settings). 
+This method is documented in the PyModbus v3.11.4 API changes document and should work with your installation.
+
+API changes since 3.10.0 have been significant
+    • ModbusSlaveContext replaced by ModbusDeviceContext
+    • payload removed (replaced by “convert_to/from_registers”)
+    • slave=, slaves= replaced by device_id=, device_ids=
+    • slave request names changed to device
+
+
