@@ -1,16 +1,20 @@
 The old Binary Payload Decoder and other functions formerly located in constants.py and utilities.py used for converting from floats in 32 bit format has been replaced in latest versions.
 
-The functions convert_from_registers and convert_to_registers were intended as a replacement but it seems they might not be in the utilities.py file in specific 3.11.4 installation, where they were supposed to have been re-located to.
-It turns out that these conversion functions are intended to be called as methods of the client instance itself (because the Modbus Client Mixin.py includes them), not as standalone functions imported from utilities. 
-The Correct Approach: Use Client Instance Methods
+The functions convert_from_registers and convert_to_registers were intended as a replacement but it seems they might not be in the utilities.py file in specific 3.11.4 installation, 
+where they were supposed to have been re-located to.
+It turns out that these conversion functions are intended to be called as methods of the client instance itself (because the Modbus Client Mixin.py includes them), not as standalone 
+functions imported from utilities.
+
+The Correct Approach: Is to Use Client Instance Methods
 You do not import the functions; you call them directly on the client object you create. The functions handle the conversion internally.
+
 Here is an example code showing how to use the new functions.
 
 No imports from payload, constants, or utilities needed for the conversion any more.
 
 
-python TCP Modbus example code with new conversion methods
-No imports from payload, constants, or utilities needed for the conversion any more.
+This is a python TCP Modbus example code with new conversion methods
+
 You can do the same thing in Modbus serial client.
 
 from pymodbus.client import ModbusTcpClient
